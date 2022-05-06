@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import co.ivanovpv.githubdata.R
 import co.ivanovpv.githubdata.api.models.GithubUser
@@ -53,8 +54,10 @@ class UserInfoDialog(private val viewModel: MainViewModel) : BottomSheetDialogFr
             viewModel.followersCountState.collect {
                 if (it.isLoading()) {
                     binding.tvFollowers.text = getString(R.string.calculating_followers)
+                    binding.progressBar.isVisible = true
                 }
                 if (it.isSuccess()) {
+                    binding.progressBar.isVisible = false
                     binding.tvFollowers.text =
                         getString(R.string.followers) + " ${it.result!!}"
                 }

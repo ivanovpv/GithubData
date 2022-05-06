@@ -32,6 +32,19 @@
         app:layout_constraintTop_toBottomOf="@id/ivIndicator"
         />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="@style/Progress.GithubData"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/ivUser"
+        app:layout_constraintBottom_toBottomOf="@id/ivUser"
+        app:layout_constraintStart_toStartOf="@id/ivUser"
+        app:layout_constraintEnd_toEndOf="@id/ivUser"
+        tools:visibility="visible"
+        />
     <TextView
         android:id="@+id/tvLogin"
         style="@style/TextAppearance.AppCompat.Title"
