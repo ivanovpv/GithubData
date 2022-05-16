@@ -10,8 +10,6 @@ import co.ivanovpv.githubdata.api.models.ApiResult
 import co.ivanovpv.githubdata.api.models.GithubUser
 import co.ivanovpv.githubdata.repo.GithubUsersPagingSource
 import co.ivanovpv.githubdata.repo.contract.IGithubRepo
-import co.ivanovpv.githubdata.utils.ErrorUtils
-import co.ivanovpv.githubdata.utils.LoggerManager
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -47,31 +45,4 @@ class GithubRepo(
         }
         return flowOf(apiResult)
     }
-
-    override suspend fun getFollowersCount(login: String): Flow<ApiResult<Int?>> {
-        var apiResult = ApiResult<Int?>()
-        val perPage = 100
-        var page = 1
-        var size = 0
-        try {
-            do {
-                val response = api.getFollowers(login, ++page, perPage)
-                if (response.isSuccessful)
-                    size += response.body()?.size ?: 0
-                else {
-                    apiResult.apiError =
-                        gson.fromJson(response.errorBody()?.string(), ApiError::class.java)
-                    break
-                }
-
-            } while (response.body()?.size ?: 0 == perPage)
-            apiResult.result = size
-        } catch (exception: Exception) {
-            apiResult.result = null
-            LoggerManager.debugJson(this, "Error", exception)
-            apiResult.apiError = ErrorUtils.handleError(exception)
-        }
-        return flowOf(apiResult)
-    }
-
 }

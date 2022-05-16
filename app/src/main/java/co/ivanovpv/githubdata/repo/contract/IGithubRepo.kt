@@ -13,6 +13,4 @@ interface IGithubRepo {
         page: Int,
         perPage: Int
     ): Flow<ApiResult<List<GithubUser>>>
-
-    suspend fun getFollowersCount(login: String): Flow<ApiResult<Int?>>
 }

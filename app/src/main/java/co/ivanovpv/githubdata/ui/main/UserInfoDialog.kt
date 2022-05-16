@@ -52,11 +52,14 @@ class UserInfoDialog(private val viewModel: MainViewModel) : BottomSheetDialogFr
         viewModel.countFollowers(user.login)
         lifecycleScope.launchWhenStarted {
             viewModel.followersCountState.collect {
-                if (it.isLoading()) {
-                    binding.tvFollowers.text = getString(R.string.calculating_followers)
+                if(it.isLoading()) {
                     binding.progressBar.isVisible = true
                 }
                 if (it.isSuccess()) {
+                    binding.tvFollowers.text = getString(R.string.calculating_followers) + " ${it.result!!}"
+                    binding.progressBar.isVisible = false
+                }
+                if (it.isFinished()) {
                     binding.progressBar.isVisible = false
                     binding.tvFollowers.text =
                         getString(R.string.followers) + " ${it.result!!}"

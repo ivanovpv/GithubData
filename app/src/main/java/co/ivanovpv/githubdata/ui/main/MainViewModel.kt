@@ -32,18 +32,30 @@ class MainViewModel @Inject constructor(
     }
 
     fun countFollowers(login: String?) {
+        var page = 1
+        var count = 0
+        val perPage = 50
+        var size = perPage
         if (login == null)
             return
         viewModelScope.launch {
             _followersCountState.value = ApiResult.Loading()
-            githubRepo.getFollowersCount(login).collect { apiResult ->
-                if (apiResult.isSuccess()) {
-                    _followersCountState.value = apiResult
+            do {
+                val apiResult = ApiResult<Int?>()
+                githubRepo.getFollowers(login, ++page, perPage).collect {
+                    if(it.isSuccess()) {
+                        size = it.result?.size ?: 0
+                        count += size
+                        apiResult.result = count
+                        _followersCountState.value = apiResult
+                    }
+                    if (it.isError()) {
+                        size = 0
+                        _errorState.emit(it.apiError!!)
+                    }
                 }
-                if (apiResult.isError()) {
-                    _errorState.emit(apiResult.apiError!!)
-                }
-            }
+            } while (size == perPage)
+            _followersCountState.value = ApiResult.Finished(count)
         }
     }
 }
