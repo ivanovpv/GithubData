@@ -10,14 +10,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
-import co.ivanovpv.githubdata.api.models.GithubUser
 import co.ivanovpv.githubdata.databinding.MainFragmentBinding
+import co.ivanovpv.githubdata.ui.info.UserInfoDialog
+import co.ivanovpv.githubdata.model.GithubUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainFragment : Fragment(), GithubUsersPagingDataAdapter.Callback {
+class MainFragment : Fragment() {
 
     companion object {
         fun newInstance() = MainFragment()
@@ -39,7 +40,7 @@ class MainFragment : Fragment(), GithubUsersPagingDataAdapter.Callback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = GithubUsersPagingDataAdapter(this)
+        adapter = GithubUsersPagingDataAdapter(::onUserSelected)
         val userList = binding.rvUsers
         userList.adapter = adapter
         lifecycleScope.launch {
@@ -47,14 +48,14 @@ class MainFragment : Fragment(), GithubUsersPagingDataAdapter.Callback {
                 adapter?.submitData(it)
             }
         }
-        lifecycleScope.launchWhenStarted {
+        /*lifecycleScope.launchWhenStarted {
             viewModel.errorState.collectLatest {
                 MyAlertDialog(requireContext())
                     .withCloseButton { }
-                    .withDescription(it.message.toString())
+                    .withDescription(it.reason)
                     .show()
             }
-        }
+        }*/
         lifecycleScope.launchWhenStarted {
             adapter?.loadStateFlow?.collectLatest { loadStates ->
                 binding.progressBar.isVisible = loadStates.refresh is LoadState.Loading
@@ -80,8 +81,8 @@ class MainFragment : Fragment(), GithubUsersPagingDataAdapter.Callback {
         _binding = null
     }
 
-    override fun onUserSelected(user: GithubUser) {
-        val dialog = UserInfoDialog.newInstance(viewModel, user)
+    fun onUserSelected(user: GithubUser) {
+        val dialog = UserInfoDialog.newInstance(user)
         dialog.showNow(this.childFragmentManager, UserInfoDialog.TAG)
     }
 

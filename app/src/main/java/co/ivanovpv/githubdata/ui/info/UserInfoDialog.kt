@@ -1,14 +1,15 @@
-package co.ivanovpv.githubdata.ui.main
+package co.ivanovpv.githubdata.ui.info
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import co.ivanovpv.githubdata.R
-import co.ivanovpv.githubdata.api.models.GithubUser
 import co.ivanovpv.githubdata.databinding.UserInfoDialogBinding
+import co.ivanovpv.githubdata.model.GithubUser
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -16,14 +17,16 @@ import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UserInfoDialog(private val viewModel: MainViewModel) : BottomSheetDialogFragment() {
+class UserInfoDialog() : BottomSheetDialogFragment() {
+
+    private val viewModel: UserInfoViewModel by viewModels()
 
     companion object {
         const val TAG = "UserInfoDialog"
         private const val USER: String = "USER"
 
-        fun newInstance(viewModel: MainViewModel, user: GithubUser) =
-            UserInfoDialog(viewModel).apply {
+        fun newInstance(user: GithubUser) =
+            UserInfoDialog().apply {
                 arguments = Bundle().apply {
                     putString(USER, Gson().toJson(user))
                 }
@@ -50,19 +53,27 @@ class UserInfoDialog(private val viewModel: MainViewModel) : BottomSheetDialogFr
         val json = arguments?.getString(USER).orEmpty()
         user = Gson().fromJson(json, GithubUser::class.java)
         viewModel.countFollowers(user.login)
-        lifecycleScope.launchWhenStarted {
+        viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.followersCountState.collect {
-                if(it.isLoading()) {
-                    binding.progressBar.isVisible = true
-                }
-                if (it.isSuccess()) {
-                    binding.tvFollowers.text = getString(R.string.calculating_followers) + " ${it.result!!}"
-                    binding.progressBar.isVisible = false
-                }
-                if (it.isFinished()) {
-                    binding.progressBar.isVisible = false
-                    binding.tvFollowers.text =
-                        getString(R.string.followers) + " ${it.result!!}"
+                when(it) {
+                    is CountState.Loading -> {
+                        binding.progressBar.isVisible = true
+                    }
+                    is CountState.Success -> {
+                        binding.tvFollowers.text = getString(R.string.calculating_followers) + " " +
+                            "${it.count}"
+                        binding.progressBar.isVisible = false
+                    }
+                    is CountState.Finished -> {
+                        binding.progressBar.isVisible = false
+                        binding.tvFollowers.text =
+                            getString(R.string.followers) + " ${it.count}"
+                    }
+                    is CountState.Error -> {
+                        binding.progressBar.isVisible = false
+                        binding.tvFollowers.text =
+                            "Something went wrong ${it.reason}"
+                    }
                 }
             }
         }

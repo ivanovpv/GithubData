@@ -5,12 +5,14 @@ import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import co.ivanovpv.githubdata.api.models.GithubUser
 import co.ivanovpv.githubdata.databinding.RowGithubUserBinding
+import co.ivanovpv.githubdata.model.GithubUser
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 
-class GithubUsersPagingDataAdapter(private val callback: Callback) :
+class GithubUsersPagingDataAdapter(
+    private val onUserSelected: (githubUser: GithubUser) -> Unit
+    ) :
     PagingDataAdapter<GithubUser, GithubUserViewHolder>(GithubUserDiffCallBack()) {
 
     override fun onBindViewHolder(holder: GithubUserViewHolder, position: Int) {
@@ -21,15 +23,11 @@ class GithubUsersPagingDataAdapter(private val callback: Callback) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GithubUserViewHolder {
         return GithubUserViewHolder(
-            callback,
+            onUserSelected,
             RowGithubUserBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             )
         )
-    }
-
-    interface Callback {
-        fun onUserSelected(user: GithubUser)
     }
 }
 
@@ -44,12 +42,12 @@ class GithubUserDiffCallBack : DiffUtil.ItemCallback<GithubUser>() {
 }
 
 class GithubUserViewHolder(
-    private val callback: GithubUsersPagingDataAdapter.Callback,
+    private val callback: (githubUser: GithubUser) -> Unit,
     private val binding: RowGithubUserBinding
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(githubUser: GithubUser) {
         binding.root.setOnClickListener {
-            callback.onUserSelected(githubUser)
+            callback(githubUser)
         }
         binding.tvLogin.text = githubUser.login
         binding.admin.isChecked = githubUser.siteAdmin

@@ -1,4 +1,4 @@
-package co.ivanovpv.githubdata.api.models
+package co.ivanovpv.githubdata.api.model
 
 import com.google.gson.annotations.SerializedName
 

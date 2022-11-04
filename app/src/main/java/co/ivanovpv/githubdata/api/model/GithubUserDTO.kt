@@ -1,8 +1,8 @@
-package co.ivanovpv.githubdata.api.models
+package co.ivanovpv.githubdata.api.model
 
 import com.google.gson.annotations.SerializedName
 
-data class GithubUser(
+data class GithubUserDTO(
     @SerializedName("id")
     val id: Int = 0,
     @SerializedName("login")
@@ -40,4 +40,3 @@ data class GithubUser(
     @SerializedName("site_admin")
     val siteAdmin: Boolean = false
 )
-
