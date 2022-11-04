@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import co.ivanovpv.githubdata.databinding.MainFragmentBinding
-import co.ivanovpv.githubdata.ui.info.UserInfoDialog
 import co.ivanovpv.githubdata.model.GithubUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -48,14 +47,6 @@ class MainFragment : Fragment() {
                 adapter?.submitData(it)
             }
         }
-        /*lifecycleScope.launchWhenStarted {
-            viewModel.errorState.collectLatest {
-                MyAlertDialog(requireContext())
-                    .withCloseButton { }
-                    .withDescription(it.reason)
-                    .show()
-            }
-        }*/
         lifecycleScope.launchWhenStarted {
             adapter?.loadStateFlow?.collectLatest { loadStates ->
                 binding.progressBar.isVisible = loadStates.refresh is LoadState.Loading
@@ -81,9 +72,9 @@ class MainFragment : Fragment() {
         _binding = null
     }
 
-    fun onUserSelected(user: GithubUser) {
-        val dialog = UserInfoDialog.newInstance(user)
-        dialog.showNow(this.childFragmentManager, UserInfoDialog.TAG)
+    private fun onUserSelected(user: GithubUser) {
+        val direction = MainFragmentDirections.actionMainFragmentToUserInfoDialog(user)
+        findNavController().navigate(direction)
     }
 
 }

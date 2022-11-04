@@ -8,6 +8,21 @@
     <fragment
         android:id="@+id/mainFragment"
         android:name="co.ivanovpv.githubdata.ui.main.MainFragment"
-        android:label="main_fragment"
-        tools:layout="@layout/main_fragment" />
+        android:label="@string/github_users"
+        tools:layout="@layout/main_fragment" >
+        <action
+            android:id="@+id/action_mainFragment_to_UserInfoDialog"
+            app:destination="@id/userInfoDialog"
+            />
+    </fragment>
+    <dialog
+        android:id="@+id/userInfoDialog"
+        android:name="co.ivanovpv.githubdata.ui.info.UserInfoDialog"
+        android:label="user_info"
+        tools:layout="@layout/user_info_dialog"
+        >
+        <argument
+            android:name="user"
+            app:argType="co.ivanovpv.githubdata.model.GithubUser" />
+    </dialog>
 </navigation>

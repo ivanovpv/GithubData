@@ -1,5 +1,9 @@
 package co.ivanovpv.githubdata.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class GithubUser(
 	val id: Int = 0,
 	val login: String? = null,
@@ -19,4 +23,4 @@ data class GithubUser(
 	val receivedEventsUrl: String? = null,
 	val type: String? = null,
 	val siteAdmin: Boolean = false
-)
+) : Parcelable

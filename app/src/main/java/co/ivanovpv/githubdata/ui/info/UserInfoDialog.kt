@@ -7,31 +7,20 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import co.ivanovpv.githubdata.R
 import co.ivanovpv.githubdata.databinding.UserInfoDialogBinding
 import co.ivanovpv.githubdata.model.GithubUser
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class UserInfoDialog() : BottomSheetDialogFragment() {
+class UserInfoDialog(): BottomSheetDialogFragment() {
 
     private val viewModel: UserInfoViewModel by viewModels()
-
-    companion object {
-        const val TAG = "UserInfoDialog"
-        private const val USER: String = "USER"
-
-        fun newInstance(user: GithubUser) =
-            UserInfoDialog().apply {
-                arguments = Bundle().apply {
-                    putString(USER, Gson().toJson(user))
-                }
-            }
-    }
+    private val args by navArgs<UserInfoDialogArgs>()
 
     private lateinit var user: GithubUser
     private var _binding: UserInfoDialogBinding? = null
@@ -50,8 +39,7 @@ class UserInfoDialog() : BottomSheetDialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val json = arguments?.getString(USER).orEmpty()
-        user = Gson().fromJson(json, GithubUser::class.java)
+        user = args.user
         viewModel.countFollowers(user.login)
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             viewModel.followersCountState.collect {
