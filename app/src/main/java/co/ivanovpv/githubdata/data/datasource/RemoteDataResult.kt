@@ -17,12 +17,7 @@ abstract class RemoteDataSource {
 							"response"))
 					}
 				}
-				else -> {
-					when(response.code()) {
-						403 -> DataResultState.Failure(parseResponse(response))
-					}
-					error("${response.code()} ${response.message()}")
-				}
+				else -> DataResultState.Failure(parseResponse(response))
 			}
 		} catch (e: Exception) {
 			error(e.message ?: e.toString())
@@ -49,8 +44,9 @@ abstract class RemoteDataSource {
 			}
 		}
 
-		return ApiErrorFailureReason(apiError ?: ApiError(message = "", documentationUrl = null),
-			response.code())
+		return ApiErrorFailureReason(
+			apiError = apiError ?: ApiError(message = "", documentationUrl = null),
+			errorCode = response.code())
 	}
 
 }

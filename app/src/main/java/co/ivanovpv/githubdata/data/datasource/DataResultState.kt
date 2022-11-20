@@ -35,6 +35,7 @@ class ApiErrorFailureReason(override val message: String, val documentationUrl: 
 val errorCode: Int?):
 	FailureReason(message, errorCode) {
 		constructor(apiError: ApiError, errorCode: Int? = null):
-			this(apiError.message, apiError.documentationUrl, errorCode)
+			this(message = apiError.message, documentationUrl = apiError.documentationUrl,
+				errorCode = errorCode)
 	}
 
