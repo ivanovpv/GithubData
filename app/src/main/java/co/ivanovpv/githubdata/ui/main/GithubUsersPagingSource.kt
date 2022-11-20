@@ -2,11 +2,10 @@ package co.ivanovpv.githubdata.ui.main
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import co.ivanovpv.githubdata.api.model.ApiError
 import co.ivanovpv.githubdata.api.model.ResponseItems
 import co.ivanovpv.githubdata.data.datasource.DataResultState
-import co.ivanovpv.githubdata.data.repository.GithubRepository
-import co.ivanovpv.githubdata.model.GithubUser
+import co.ivanovpv.githubdata.domain.repository.GithubRepository
+import co.ivanovpv.githubdata.domain.model.GithubUser
 import co.ivanovpv.githubdata.utils.LoggerManager
 import com.google.gson.Gson
 
@@ -39,9 +38,8 @@ class GithubUsersPagingSource(
                         prevKey = prevKey
                     )
                 }
-                is DataResultState.Failure -> {
-                    val apiError = gson.fromJson(response.reason, ApiError::class.java)
-                    LoadResult.Error<Int, GithubUser>(Exception(apiError.message))
+                is DataResultState.Failure  -> {
+                    LoadResult.Error<Int, GithubUser>(Exception(response.failureReason.message))
                 }
             }
         } catch (ex: Exception) {

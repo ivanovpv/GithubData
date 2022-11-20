@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import co.ivanovpv.githubdata.databinding.MainFragmentBinding
-import co.ivanovpv.githubdata.model.GithubUser
+import co.ivanovpv.githubdata.domain.model.GithubUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -19,15 +19,10 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class MainFragment : Fragment() {
 
-    companion object {
-        fun newInstance() = MainFragment()
-    }
-
     private val viewModel: MainViewModel by viewModels()
     private var _binding: MainFragmentBinding? = null
     private val binding get() = _binding!!
     private var adapter: GithubUsersPagingDataAdapter? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

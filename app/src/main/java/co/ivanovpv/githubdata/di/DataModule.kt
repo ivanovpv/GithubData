@@ -3,7 +3,7 @@ package co.ivanovpv.githubdata.di
 import co.ivanovpv.githubdata.data.datasource.GithubDataSource
 import co.ivanovpv.githubdata.data.datasource.GithubDataSourceImpl
 import co.ivanovpv.githubdata.data.repository.GithubRepositoryImpl
-import co.ivanovpv.githubdata.data.repository.GithubRepository
+import co.ivanovpv.githubdata.domain.repository.GithubRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

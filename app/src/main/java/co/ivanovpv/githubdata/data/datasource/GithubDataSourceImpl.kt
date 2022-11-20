@@ -7,20 +7,21 @@ import javax.inject.Inject
 class GithubDataSourceImpl @Inject constructor(
 	private val githubAPI: GithubAPI,
 ): GithubDataSource, BasicRemoteDataSource() {
-	override suspend fun getGithubUsers(): DataResultState<List<GithubUserDTO>?> {
-		return getBodyResult {
+	override suspend fun getGithubUsers(): DataResultState<List<GithubUserDTO>, FailureReason> {
+		val result = getBodyResult {
 			githubAPI.getGithubUsers()
 		}
+		return result
 	}
 
-	override suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUserDTO>?> {
+	override suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUserDTO>, FailureReason> {
 		return getBodyResult {
 			githubAPI.getGithubUsersSince(since)
 		}
 	}
 
 	override suspend fun getFollowers(login: String, page: Int, perPage: Int):
-		DataResultState<List<GithubUserDTO>?> {
+		DataResultState<List<GithubUserDTO>, FailureReason> {
 		return getBodyResult {
 			githubAPI.getFollowers(login, page, perPage)
 		}

@@ -1,4 +1,4 @@
-package co.ivanovpv.githubdata.model
+package co.ivanovpv.githubdata.domain.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

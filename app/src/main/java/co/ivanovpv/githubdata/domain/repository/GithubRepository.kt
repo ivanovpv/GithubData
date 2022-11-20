@@ -1,0 +1,20 @@
+package co.ivanovpv.githubdata.domain.repository
+
+import androidx.paging.PagingData
+import co.ivanovpv.githubdata.data.datasource.DataResultState
+import co.ivanovpv.githubdata.data.datasource.FailureReason
+import co.ivanovpv.githubdata.domain.model.GithubUser
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+
+interface GithubRepository {
+	suspend fun getGithubUsers(): DataResultState<List<GithubUser>, FailureReason>
+	suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUser>, FailureReason>
+	suspend fun getPagedGithubUsers(scope: CoroutineScope): Flow<PagingData<GithubUser>>
+	suspend fun getFollowers(
+		login: String,
+		page: Int,
+		perPage: Int,
+	): Flow<DataResultState<List<GithubUser>, FailureReason>>
+
+}

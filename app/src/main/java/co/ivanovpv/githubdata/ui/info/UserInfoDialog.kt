@@ -9,8 +9,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import co.ivanovpv.githubdata.R
+import co.ivanovpv.githubdata.data.datasource.TextFailureReason
 import co.ivanovpv.githubdata.databinding.UserInfoDialogBinding
-import co.ivanovpv.githubdata.model.GithubUser
+import co.ivanovpv.githubdata.domain.model.GithubUser
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -26,7 +27,6 @@ class UserInfoDialog(): BottomSheetDialogFragment() {
     private var _binding: UserInfoDialogBinding? = null
     private val binding
         get() = _binding!!
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,14 +48,12 @@ class UserInfoDialog(): BottomSheetDialogFragment() {
                         binding.progressBar.isVisible = true
                     }
                     is CountState.Success -> {
-                        binding.tvFollowers.text = getString(R.string.calculating_followers) + " " +
-                            "${it.count}"
+                        binding.tvFollowers.text = getString(R.string.calculating_followers, it.count)
                         binding.progressBar.isVisible = false
                     }
                     is CountState.Finished -> {
                         binding.progressBar.isVisible = false
-                        binding.tvFollowers.text =
-                            getString(R.string.followers) + " ${it.count}"
+                        binding.tvFollowers.text = getString(R.string.followers, it.count)
                     }
                     is CountState.Error -> {
                         binding.progressBar.isVisible = false

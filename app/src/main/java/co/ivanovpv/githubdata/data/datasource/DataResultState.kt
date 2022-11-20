@@ -1,12 +1,17 @@
 package co.ivanovpv.githubdata.data.datasource
 
-sealed class DataResultState<out T> {
-	data class Success<T>(val data: T) : DataResultState<T>()
-	data class Failure(val reason: String) : DataResultState<Nothing>()
+import co.ivanovpv.githubdata.api.model.ApiError
 
-	fun <R> convert(convert: (T) -> R): DataResultState<R> = when (this) {
+
+sealed class DataResultState<out T, out F> {
+	data class Success<T>(val data: T) : DataResultState<T, Nothing>()
+	data class Failure<F : FailureReason>(val failureReason: F) : DataResultState<Nothing, F>() {
+		val reason get() = failureReason.message
+	}
+
+	fun <R> convert(converter: (T) -> R): DataResultState<R, F> = when (this) {
 		is Failure -> this
-		is Success -> Success(convert(this.data))
+		is Success -> Success(converter(this.data))
 	}
 
 	fun isSuccess(): Boolean {
@@ -17,3 +22,19 @@ sealed class DataResultState<out T> {
 		return this is Failure
 	}
 }
+
+sealed class FailureReason(
+	open val message: String,
+	open val errorCode: Int? = null,
+	val stackTrace: String? = null,
+)
+
+class TextFailureReason(override val message: String): FailureReason(message)
+
+class ApiErrorFailureReason(override val message: String, val documentationUrl: String?, override
+val errorCode: Int?):
+	FailureReason(message, errorCode) {
+		constructor(apiError: ApiError, errorCode: Int? = null):
+			this(apiError.message, apiError.documentationUrl, errorCode)
+	}
+

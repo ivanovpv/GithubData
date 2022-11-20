@@ -6,7 +6,7 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import co.ivanovpv.githubdata.databinding.RowGithubUserBinding
-import co.ivanovpv.githubdata.model.GithubUser
+import co.ivanovpv.githubdata.domain.model.GithubUser
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 

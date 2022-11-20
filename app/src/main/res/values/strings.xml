@@ -2,6 +2,6 @@
     <string name="app_name">GithubData</string>
     <string name="github_users">Github users</string>
     <string name="site_admin">Site admin</string>
-    <string name="calculating_followers">Calculating followers...</string>
-    <string name="followers">Followers (reported by Github Rest API): </string>
+    <string name="calculating_followers">Calculating followers... %1$d</string>
+    <string name="followers">Followers (reported by Github Rest API): %1$d</string>
 </resources>

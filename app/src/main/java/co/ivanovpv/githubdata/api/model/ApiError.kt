@@ -2,10 +2,9 @@ package co.ivanovpv.githubdata.api.model
 
 import com.google.gson.annotations.SerializedName
 
-class ApiError {
+data class ApiError(
     @SerializedName("message")
-    var message: String? = null
-
+    val message: String,
     @SerializedName("documentation_url")
-    var documentationUrl: String? = null
-}
+    val documentationUrl: String? = null,
+)

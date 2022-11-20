@@ -5,4 +5,6 @@ sealed class CountState {
 	class Error(val reason: String): CountState()
 	object Loading: CountState()
 	class Finished(val count: Int): CountState()
+
+	fun isError() = this is Error
 }

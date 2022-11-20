@@ -23,6 +23,6 @@
         >
         <argument
             android:name="user"
-            app:argType="co.ivanovpv.githubdata.model.GithubUser" />
+            app:argType="co.ivanovpv.githubdata.domain.model.GithubUser" />
     </dialog>
 </navigation>
