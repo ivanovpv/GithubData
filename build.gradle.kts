@@ -1,25 +1,25 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-plugins {
-    id("org.jetbrains.kotlin.android") version "1.7.20" apply false
-}
-
 buildscript {
-    val kotlinVersion by extra { "1.7.20" }
-    val hiltVersion by extra { "2.44" }
-    val navVersion by extra { "2.5.2" }
-
     repositories {
         google()
-        mavenCentral()
+    }
+    extra.apply {
+        set("kotlinVersion", "1.9.0") //check also KSP and composeVersions!
+        set("composeVersion", "1.5.2")
+        set("navVersion", "2.6.0")
+        set("hiltVersion", "2.48") //2.48 min version with KSP support
     }
     dependencies {
-        classpath ("com.android.tools.build:gradle:7.3.0")
-        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
-        classpath ("com.google.dagger:hilt-android-gradle-plugin:$hiltVersion")
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
+        val kotlinVersion: String by rootProject.extra
+        val navVersion: String by rootProject.extra
+        classpath ("androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion")
+        classpath("org.jetbrains.kotlin:kotlin-serialization:$kotlinVersion")
     }
 }
-
-tasks.register("clean", Delete::class) {
-    delete(rootProject.buildDir)
+plugins {
+    id ("com.android.application") version "8.1.0" apply false
+    id ("com.android.library") version "8.1.0" apply false
+    id ("org.jetbrains.kotlin.android") version "1.9.0" apply false
+    id ("com.google.dagger.hilt.android") version "2.48" apply false
+    id ("androidx.navigation.safeargs") version "2.6.0" apply false
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply false
 }

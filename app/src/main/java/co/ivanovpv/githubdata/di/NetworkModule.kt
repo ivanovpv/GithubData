@@ -1,18 +1,20 @@
 package co.ivanovpv.githubdata.di
 
 import android.content.Context
-import co.ivanovpv.githubdata.BuildConfig
 import co.ivanovpv.githubdata.api.GithubAPI
 import co.ivanovpv.githubdata.app.AppConfiguration
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.Interceptor
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -41,15 +43,25 @@ object NetworkModule {
 
     @Provides
     @Singleton
+    fun provideJson(): Json {
+        return Json {
+            isLenient = true
+            ignoreUnknownKeys = true
+        }
+    }
+
+    @Provides
+    @Singleton
     fun provideRetrofit(
         appConfiguration: AppConfiguration,
         okHttpClient: OkHttpClient,
-        gson: Gson
+        json: Json
     ): Retrofit =
         Retrofit.Builder()
             .baseUrl(appConfiguration.getGithubBaseUrl())
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            //.addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .client(okHttpClient)
             .build()
 
@@ -89,7 +101,7 @@ object NetworkModule {
             val builder = chain.request().newBuilder().apply {
                 addHeader("Content-Type", "application/vnd.api+json")
                 addHeader("Accept", "application/json")
-                addHeader("App-Version", BuildConfig.VERSION_NAME)
+                //addHeader("App-Version", BuildConfig.VERSION_NAME)
                 addHeader("Platform", "Android")
             }
             return@Interceptor chain.proceed(builder.build())

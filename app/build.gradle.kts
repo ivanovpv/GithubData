@@ -6,10 +6,13 @@ plugins {
     id ("kotlin-parcelize")
     id ("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
+    id("kotlinx-serialization")
 }
 
-val hiltVersion = project.rootProject.ext["hiltVersion"]
-val navVersion = project.rootProject.ext["navVersion"]
+val kotlinVersion: String by rootProject.extra
+val composeVersion: String by rootProject.extra
+var hiltVersion: String by rootProject.extra
+val navVersion: String by rootProject.extra
 
 android {
     namespace = "co.ivanovpv.githubdata"
@@ -85,6 +88,11 @@ dependencies {
 
     //paging
     implementation ("androidx.paging:paging-runtime-ktx:3.1.1")
+
+    // Kotlin Json
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
 
     //test
     testImplementation ("junit:junit:4.13.2")
