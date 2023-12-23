@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import co.ivanovpv.githubdata.api.GithubService
 import co.ivanovpv.githubdata.data.datasource.DataResultState
 import co.ivanovpv.githubdata.data.datasource.FailureReason
 import co.ivanovpv.githubdata.data.datasource.GithubDataSource
@@ -19,24 +20,31 @@ import javax.inject.Inject
 
 class GithubRepositoryImpl @Inject constructor(
 	private val githubDataSource: GithubDataSource,
+	private val githubService: GithubService,
 	private val gson: Gson,
 	): GithubRepository {
 
 	override suspend fun getGithubUsers(): DataResultState<List<GithubUser>, FailureReason> {
+		/*
 		val result = githubDataSource.getGithubUsers().convert {
 			it.map { userDto ->
 				userDto.toDomain()
 			}
 		}
-		return result
+		return result*/
+		return githubService.getGithubUsers().convert {
+			it.map {userDto ->
+				userDto.toDomain()
+			}
+		}
 
 	}
 
 	override suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUser>, FailureReason> {
 		return githubDataSource.getGithubUsersSince(since).convert {
-			it?.map { userDto ->
+			it.map { userDto ->
 				userDto.toDomain()
-			} ?: listOf()
+			}
 		}
 	}
 
@@ -59,9 +67,9 @@ class GithubRepositoryImpl @Inject constructor(
 		perPage: Int,
 	): Flow<DataResultState<List<GithubUser>, FailureReason>> {
 		val result = githubDataSource.getFollowers(login, page, perPage).convert {
-			it?.map { userDto ->
+			it.map { userDto ->
 				userDto.toDomain()
-			} ?: listOf()
+			}
 		}
 		return flowOf(result)
 	}

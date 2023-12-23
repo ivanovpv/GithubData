@@ -2,6 +2,8 @@ package co.ivanovpv.githubdata.di
 
 import android.content.Context
 import co.ivanovpv.githubdata.api.GithubAPI
+import co.ivanovpv.githubdata.api.GithubService
+import co.ivanovpv.githubdata.api.GithubServiceImpl
 import co.ivanovpv.githubdata.app.AppConfiguration
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -11,6 +13,18 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.Interceptor
@@ -18,7 +32,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -106,5 +119,32 @@ object NetworkModule {
             }
             return@Interceptor chain.proceed(builder.build())
         }
+
+    @Singleton
+    @Provides
+    fun provideHttpClient(appConfiguration: AppConfiguration):HttpClient{
+        return HttpClient(Android){
+            install(Logging){
+                level= LogLevel.ALL
+            }
+            install(DefaultRequest){
+                url(appConfiguration.getGithubBaseUrl())
+                header(HttpHeaders.ContentType, ContentType.Application.Json)
+                //header("X-Api-Key",BuildConfig.API_KEY)
+            }
+            install(ContentNegotiation){
+                json(Json)
+            }
+        }
+    }
+
+    @Singleton
+    @Provides
+    fun provideGithubService(httpClient: HttpClient): GithubService= GithubServiceImpl(httpClient)
+
+
+
+    @Provides
+    fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default
 
 }
