@@ -2,8 +2,6 @@ package co.ivanovpv.githubdata.di
 
 import android.content.Context
 import co.ivanovpv.githubdata.api.GithubAPI
-import co.ivanovpv.githubdata.api.GithubService
-import co.ivanovpv.githubdata.api.GithubServiceImpl
 import co.ivanovpv.githubdata.app.AppConfiguration
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -137,12 +135,6 @@ object NetworkModule {
             }
         }
     }
-
-    @Singleton
-    @Provides
-    fun provideGithubService(httpClient: HttpClient): GithubService= GithubServiceImpl(httpClient)
-
-
 
     @Provides
     fun provideDispatcher(): CoroutineDispatcher = Dispatchers.Default

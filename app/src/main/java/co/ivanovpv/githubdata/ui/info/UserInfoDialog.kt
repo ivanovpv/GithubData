@@ -9,7 +9,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import co.ivanovpv.githubdata.R
-import co.ivanovpv.githubdata.data.datasource.TextFailureReason
 import co.ivanovpv.githubdata.databinding.UserInfoDialogBinding
 import co.ivanovpv.githubdata.domain.model.GithubUser
 import com.bumptech.glide.Glide

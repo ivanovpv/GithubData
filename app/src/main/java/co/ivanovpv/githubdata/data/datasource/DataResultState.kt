@@ -1,16 +1,23 @@
 package co.ivanovpv.githubdata.data.datasource
 
-import co.ivanovpv.githubdata.api.model.ApiError
+import java.lang.Exception
 
+sealed class DataResultState<out T> {
 
-sealed class DataResultState<out T, out F> {
-	data class Success<T>(val data: T) : DataResultState<T, Nothing>()
-	data class Failure<F : FailureReason>(val failureReason: F) : DataResultState<Nothing, F>() {
-		val reason get() = failureReason.message
+	data class Success<T>(val data: T) : DataResultState<T>()
+
+	open class Failure<T>(open val message: String, val details: List<String>) : DataResultState<T>() {
+		constructor(exception: Exception): this(exception.message ?: "", exception.stackTraceToString().split("\n"))
 	}
 
-	fun <R> convert(converter: (T) -> R): DataResultState<R, F> = when (this) {
-		is Failure -> this
+	data class ApiFailure<T>(
+		override val message: String,
+		val errorCode: Int,
+		val documentationUrl: String?): Failure<T>(message, listOf())
+
+	fun <R> convert(converter: (T) -> R): DataResultState<R> = when (this) {
+		is ApiFailure -> ApiFailure(this.message, this.errorCode, this.documentationUrl)
+		is Failure -> Failure(this.message, this.details)
 		is Success -> Success(converter(this.data))
 	}
 
@@ -22,20 +29,3 @@ sealed class DataResultState<out T, out F> {
 		return this is Failure
 	}
 }
-
-sealed class FailureReason(
-	open val message: String,
-	open val errorCode: Int? = null,
-	val stackTrace: String? = null,
-)
-
-class TextFailureReason(override val message: String): FailureReason(message)
-
-class ApiErrorFailureReason(override val message: String, val documentationUrl: String?, override
-val errorCode: Int?):
-	FailureReason(message, errorCode) {
-		constructor(apiError: ApiError, errorCode: Int? = null):
-			this(message = apiError.message, documentationUrl = apiError.documentationUrl,
-				errorCode = errorCode)
-	}
-

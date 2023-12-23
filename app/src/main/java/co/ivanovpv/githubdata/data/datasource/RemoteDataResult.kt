@@ -1,11 +1,36 @@
 package co.ivanovpv.githubdata.data.datasource
 
+import android.util.Log
 import co.ivanovpv.githubdata.api.model.ApiError
 import com.google.gson.Gson
+import io.ktor.client.call.body
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import retrofit2.Response
 
 abstract class RemoteDataSource {
-	protected suspend fun <T> getBodyResult(call: suspend () -> Response<T>): DataResultState<T, FailureReason> {
+
+	protected suspend inline fun <reified T> ktorBodyResult(call: suspend () -> HttpResponse): DataResultState<T> {
+		return try {
+			val response = call()
+			Log.i("ivanovpv", response.toString())
+			when (response.status.value) {
+				in (200..299) -> {
+					DataResultState.Success(response.body())
+				}
+
+				else -> {
+					val text = response.bodyAsText()
+					parseResponse(text, response)
+				}
+			}
+		}
+		catch(ex: Exception) {
+			error(ex)
+		}
+	}
+
+	protected suspend fun <T> getBodyResult(call: suspend () -> Response<T>): DataResultState<T> {
 		val result = try {
 			val response = call()
 			val body = response.body()
@@ -13,11 +38,10 @@ abstract class RemoteDataSource {
 				response.isSuccessful -> {
 					when {
 						body != null -> DataResultState.Success(body)
-						else -> DataResultState.Failure(TextFailureReason("Server returned empty " +
-							"response"))
+						else -> DataResultState.Failure("Server returned empty response", listOf())
 					}
 				}
-				else -> DataResultState.Failure(parseResponse(response))
+				else -> parseResponse(response)
 			}
 		} catch (e: Exception) {
 			error(e.message ?: e.toString())
@@ -25,28 +49,45 @@ abstract class RemoteDataSource {
 		return result
 	}
 
-	private fun <T> error(message: String): DataResultState<T, FailureReason> {
-		return DataResultState.Failure(TextFailureReason(message))
+	private fun <T> error(message: String): DataResultState<T> {
+		return DataResultState.Failure<T>(message, listOf())
 	}
 
-	private fun <T> parseResponse(response: Response<T>): ApiErrorFailureReason {
+	private fun <T> parseResponse(response: Response<T>): DataResultState.Failure<T> {
 		val reader = response.errorBody()?.charStream()
-		val apiError = reader?.use {
+		return reader?.let {
 			try {
-				//пытаемся сначала распарсить как ApiError
-				Gson().fromJson(it, ApiError::class.java)
-			}
-			catch(ex: Exception) {
-				//если не получается - значит это Exception, который пихаем как ApiError
+				//trying to parse as ApiError
+				val result = Gson().fromJson(it, ApiError::class.java)
+				DataResultState.ApiFailure<T>(
+					result.message,
+					response.code(),
+					result.documentationUrl
+				)
+			} catch (ex: Exception) {
+				//otherwise it's just exception
 				val lines = it.readLines()
-				val message = if(lines.isEmpty()) "" else lines[0] //первая строка описание Exception
-				ApiError(message)
+				val message = if (lines.isEmpty()) "" else lines[0] //first line of exception
+				DataResultState.Failure<T>(message, lines)
 			}
-		}
+		}?: DataResultState.Failure<T>("", listOf()) //unspecified error
+	}
 
-		return ApiErrorFailureReason(
-			apiError = apiError ?: ApiError(message = "", documentationUrl = null),
-			errorCode = response.code())
+	fun <T> parseResponse(body: String, response: HttpResponse): DataResultState.Failure<T> {
+		return try {
+			//trying to parse as ApiError
+			val result = Gson().fromJson(body, ApiError::class.java)
+			DataResultState.ApiFailure(
+				result.message,
+				response.status.value,
+				result.documentationUrl
+			)
+		} catch (ex: Exception) {
+			//otherwise it's just exception
+			val lines = body.split("\n")
+			val message = if (lines.isEmpty()) "" else lines[0] //first line of exception
+			DataResultState.Failure(message, lines)
+		}
 	}
 
 }
