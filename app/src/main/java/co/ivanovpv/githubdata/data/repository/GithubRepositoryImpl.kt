@@ -5,7 +5,6 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import co.ivanovpv.githubdata.data.datasource.DataResultState
-import co.ivanovpv.githubdata.data.datasource.FailureReason
 import co.ivanovpv.githubdata.data.datasource.GithubDataSource
 import co.ivanovpv.githubdata.data.toDomain
 import co.ivanovpv.githubdata.domain.repository.GithubRepository
@@ -22,21 +21,29 @@ class GithubRepositoryImpl @Inject constructor(
 	private val gson: Gson,
 	): GithubRepository {
 
-	override suspend fun getGithubUsers(): DataResultState<List<GithubUser>, FailureReason> {
+	override suspend fun getGithubUsers(): DataResultState<List<GithubUser>> {
 		val result = githubDataSource.getGithubUsers().convert {
 			it.map { userDto ->
 				userDto.toDomain()
 			}
 		}
 		return result
+		/*
+		return githubService.getGithubUsers().convert {
+			it.map {userDto ->
+				userDto.toDomain()
+			}
+		}
+
+		 */
 
 	}
 
-	override suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUser>, FailureReason> {
+	override suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUser>> {
 		return githubDataSource.getGithubUsersSince(since).convert {
-			it?.map { userDto ->
+			it.map { userDto ->
 				userDto.toDomain()
-			} ?: listOf()
+			}
 		}
 	}
 
@@ -47,7 +54,7 @@ class GithubRepositoryImpl @Inject constructor(
 				enablePlaceholders = false
 			),
 			pagingSourceFactory = {
-				val pagingSource = GithubUsersPagingSource(this, gson)
+				val pagingSource = GithubUsersPagingSource(this)
 				pagingSource
 			}
 		).flow.cachedIn(scope)
@@ -57,11 +64,11 @@ class GithubRepositoryImpl @Inject constructor(
 		login: String,
 		page: Int,
 		perPage: Int,
-	): Flow<DataResultState<List<GithubUser>, FailureReason>> {
+	): Flow<DataResultState<List<GithubUser>>> {
 		val result = githubDataSource.getFollowers(login, page, perPage).convert {
-			it?.map { userDto ->
+			it.map { userDto ->
 				userDto.toDomain()
-			} ?: listOf()
+			}
 		}
 		return flowOf(result)
 	}

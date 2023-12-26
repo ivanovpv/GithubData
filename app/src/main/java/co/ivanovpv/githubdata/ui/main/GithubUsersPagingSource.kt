@@ -7,11 +7,9 @@ import co.ivanovpv.githubdata.data.datasource.DataResultState
 import co.ivanovpv.githubdata.domain.repository.GithubRepository
 import co.ivanovpv.githubdata.domain.model.GithubUser
 import co.ivanovpv.githubdata.utils.LoggerManager
-import com.google.gson.Gson
 
 class GithubUsersPagingSource(
     private val githubRepository: GithubRepository,
-    private val gson: Gson
 ) : PagingSource<Int, GithubUser>() {
     override fun getRefreshKey(state: PagingState<Int, GithubUser>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
@@ -21,7 +19,7 @@ class GithubUsersPagingSource(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GithubUser> {
-        var nextKey: Int?
+        val nextKey: Int?
         val prevKey = params.key
         return try {
             val response = if (prevKey == null)
@@ -39,7 +37,7 @@ class GithubUsersPagingSource(
                     )
                 }
                 is DataResultState.Failure  -> {
-                    LoadResult.Error<Int, GithubUser>(Exception(response.failureReason.message))
+                    LoadResult.Error<Int, GithubUser>(Exception(response.message))
                 }
             }
         } catch (ex: Exception) {
