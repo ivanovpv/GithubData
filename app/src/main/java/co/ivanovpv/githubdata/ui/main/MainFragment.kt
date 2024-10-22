@@ -1,6 +1,7 @@
 package co.ivanovpv.githubdata.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,10 +43,12 @@ class MainFragment : Fragment() {
                 adapter?.submitData(it)
             }
         }
-        lifecycleScope.launchWhenStarted {
+        lifecycleScope.launch {
             adapter?.loadStateFlow?.collectLatest { loadStates ->
                 binding.progressBar.isVisible = loadStates.refresh is LoadState.Loading
+                Log.i("ivanovpv", "load state = ${loadStates}")
                 if (loadStates.refresh is LoadState.Error) {
+                    Log.i("ivanovpv", "load state in error")
                     MyAlertDialog(requireContext())
                         .withCloseButton { this@MainFragment.onBackPressed() }
                         .withDescription((loadStates.refresh as LoadState.Error).error.localizedMessage ?: "")

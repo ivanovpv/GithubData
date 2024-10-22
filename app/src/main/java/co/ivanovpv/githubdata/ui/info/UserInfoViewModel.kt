@@ -36,7 +36,7 @@ class UserInfoViewModel @Inject constructor(
 						}
 						is DataResultState.Failure -> {
 							size = 0
-							_followersCountState.value = CountState.Error(it.failureReason.message)
+							_followersCountState.value = CountState.Error(it.message)
 						}
 					}
 				}
