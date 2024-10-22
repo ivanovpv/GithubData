@@ -6,4 +6,7 @@ import co.ivanovpv.githubdata.data.datasource.FailureReason
 
 interface GithubService {
     suspend fun getGithubUsers(): DataResultState<List<GithubUserDto>, FailureReason>
+    suspend fun getGithubUsersSince(since: Int): DataResultState<List<GithubUserDto>, FailureReason>
+    suspend fun getFollowers(login: String, page: Int, perPage: Int):
+            DataResultState<List<GithubUserDto>, FailureReason>
 }

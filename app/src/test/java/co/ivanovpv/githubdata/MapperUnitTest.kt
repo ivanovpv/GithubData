@@ -3,8 +3,6 @@ package co.ivanovpv.githubdata
 import co.ivanovpv.githubdata.api.model.GithubUserDto
 import co.ivanovpv.githubdata.data.toDomain
 import co.ivanovpv.githubdata.data.toDto
-import co.ivanovpv.githubdata.domain.model.GithubUser
-import com.google.gson.Gson
 import kotlinx.serialization.json.Json
 import org.junit.Assert.*
 import org.junit.Before

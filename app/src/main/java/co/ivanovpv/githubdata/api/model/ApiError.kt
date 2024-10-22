@@ -1,10 +1,13 @@
 package co.ivanovpv.githubdata.api.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class ApiError(
-    @SerializedName("message")
+    @SerialName("message")
     val message: String,
-    @SerializedName("documentation_url")
+    @SerialName("documentation_url")
     val documentationUrl: String? = null,
 )

@@ -1,7 +1,7 @@
 package co.ivanovpv.githubdata.di
 
-import co.ivanovpv.githubdata.data.datasource.GithubDataSource
-import co.ivanovpv.githubdata.data.datasource.GithubDataSourceImpl
+import co.ivanovpv.githubdata.api.GithubService
+import co.ivanovpv.githubdata.api.GithubServiceImpl
 import co.ivanovpv.githubdata.data.repository.GithubRepositoryImpl
 import co.ivanovpv.githubdata.domain.repository.GithubRepository
 import dagger.Binds
@@ -20,6 +20,6 @@ abstract class DataModule {
 
     @Binds
     @Singleton
-    abstract fun bindGithubDataSource(githubDataSourceImpl: GithubDataSourceImpl): GithubDataSource
+    abstract fun bindGithuService(githubServiceImpl: GithubServiceImpl): GithubService
 
 }
